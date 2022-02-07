@@ -46,3 +46,4 @@ if [ "$3" = "--install-dnd-sync" ]; then
     echo "Dnd-sync v1.0 installed successfully"
 elif [ "$3" = "--skip-dnd-sync" ]; then
     echo "Not installing dnd-sync"
+fi
