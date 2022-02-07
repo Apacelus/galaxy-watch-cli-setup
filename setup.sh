@@ -5,7 +5,6 @@ fi
 echo "Enter IP address of the watch:"
 read watch_IP
 watch_IP="$watch_IP:5555"
-# while == "failed to authenticate to $watch_IP"
 stop=0
 # Connecting to watch
 while [ 0 == $stop ]
@@ -20,6 +19,7 @@ do
         sleep 1
     fi
 done
+
 # Bloat removal part
 if [ "$1" = "--remove-bloat" ]; then
     echo "Removing Samsung pay, bixby and worldclock"
@@ -30,20 +30,33 @@ if [ "$1" = "--remove-bloat" ]; then
 elif [ "$1" = "--keep-bloat" ]; then
     echo "Keeping bloat"
 fi
+
 # SHM install part
 if [ "$2" = "--replace-shm" ]; then
     echo "Removing stock SHM"
     adb shell pm uninstall -k --user 0 com.samsung.android.shealthmonitor
-    adb install curl "https://drive.google.com/file/d/1EgM6DmqceKMhWQuLurQZq75Xvu1GA123/view?usp=sharing"
-    echo "Installed SHM successfully" 
+    curl "https://drive.google.com/file/d/1EgM6DmqceKMhWQuLurQZq75Xvu1GA123/view?usp=sharing" -o shm_mod.apk
+    adb install ./shm_mod.apk
+    echo "Replaced SHM successfully" 
 elif [ "$2" = "--keep-shm" ]; then
-    adb install curl "https://drive.google.com/file/d/1EgM6DmqceKMhWQuLurQZq75Xvu1GA123/view?usp=sharing"
+        curl "https://drive.google.com/file/d/1EgM6DmqceKMhWQuLurQZq75Xvu1GA123/view?usp=sharing" -o shm_mod.apk
+    adb install ./shm_mod.apk
     echo "Installed SHM successfully"
+elif [ "$2" = "--skip-shm" ]; then
+    echo "Skipping SHM install"
 fi
+
 # Installing dnd-sync
-if [ "$3" = "--install-dnd-sync" ]; then
-    adb install curl "https://github.com/rhaeus/dnd-sync/releases/download/v1.0/dndsync_mobile.apk"
+if [ "$3" = "--install-dndsync" ]; then
+    curl "https://github.com/rhaeus/dnd-sync/releases/download/v1.0/dndsync_mobile.apk" -o dndsync.apk
+    adb install ./dndsync.apk
     echo "Dnd-sync v1.0 installed successfully"
-elif [ "$3" = "--skip-dnd-sync" ]; then
-    echo "Not installing dnd-sync"
+elif [ "$3" = "" ]; then
+    echo "Skipping dnd-sync install"
 fi
+
+echo "Removing install files from local machine"
+rm -rf ./shm_mod.apk
+rm -rf ./dndsync.apk
+echo "Installation complete. DONT FORGET TO TURN OFF ADB ON WATCH!!!"
+exit 1
